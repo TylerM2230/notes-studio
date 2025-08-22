@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notes Studio - Student Observation Tool</title>
+
+    <!-- External Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Monaco Editor Setup -->
+    <script src="config/monaco-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+
+    <!-- Embedded Tailwind CSS - Production Ready -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config/app-config.js"></script>
+
+    <!-- Modern icons - Alternative reliable source -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
+    />
+
+    <!-- Google Fonts for better typography -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <div id="root"></div>
+
+    <!-- App Data -->
+    <script src="src/data/templates.js"></script>
+
+    <!-- Enhanced Autocomplete System -->
+    <script src="src/data/notes-analyzer.js"></script>
+    <script src="src/data/data-loader.js"></script>
+    <script src="src/data/suggestion-engine.js"></script>
+    <script src="src/data/monaco-integration.js"></script>
+
+    <!-- Browser Compatibility Check -->
+    <script>
+      // Check if running from file:// protocol and warn user
+      if (window.location.protocol === "file:") {
+        console.warn("⚠️ Application loaded from file:// protocol");
+        console.warn("For full functionality, please run a local web server:");
+        console.warn("  Python: python -m http.server 8000");
+        console.warn("  Node.js: npx serve .");
+        console.warn("  Then visit: http://localhost:8000");
+
+        // Add visible warning to page
+        document.addEventListener("DOMContentLoaded", function () {
+          const warning = document.createElement("div");
+          warning.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                    color: white;
+                    padding: 12px;
+                    text-align: center;
+                    z-index: 10000;
+                    font-family: system-ui, sans-serif;
+                    font-size: 14px;
+                    font-weight: 600;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                `;
+          warning.innerHTML = `
+                    <div style="max-width: 1200px; margin: 0 auto;">
+                        ⚠️ <strong>Local File Mode Detected</strong> - 
+                        Enhanced autocomplete disabled. Run local server for full features:
+                        <code style="background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 3px; margin: 0 4px;">python -m http.server 8000</code>
+                        <button onclick="this.parentElement.parentElement.remove()" style="
+                            background: rgba(255,255,255,0.2);
+                            border: none;
+                            color: white;
+                            padding: 4px 8px;
+                            border-radius: 3px;
+                            cursor: pointer;
+                            margin-left: 8px;
+                        ">×</button>
+                    </div>
+                `;
+          document.body.insertBefore(warning, document.body.firstChild);
+        });
+      }
+    </script>
+
+    <!-- Main Application -->
+    <script type="text/babel" src="src/app.js"></script>
+  </body>
+</html>

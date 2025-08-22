@@ -1,0 +1,621 @@
+/* Enhanced icon styles */
+.icon {
+    display: inline-block;
+    width: 1.2em;
+    text-align: center;
+}
+
+/* Ensure Font Awesome icons are properly sized */
+.fas, .far, .fab {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", sans-serif;
+    font-weight: 900;
+}
+
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.monaco-container, .monaco-container * {
+    font-family: 'Courier New', 'Courier', monospace !important;
+}
+
+/* Override Monaco editor internal styles */
+.monaco-editor, .monaco-editor * {
+    font-family: 'Courier New', 'Courier', monospace !important;
+}
+
+/* Override Monaco editor lines specifically */
+.monaco-editor .view-lines .view-line span {
+    font-family: 'Courier New', 'Courier', monospace !important;
+}
+
+/* Also ensure textarea fallback uses Courier */
+textarea.courier-font {
+    font-family: 'Courier New', 'Courier', monospace !important;
+}
+
+/* Clean editor background without grid lines */
+.editor-grid-background {
+    background-color: var(--bg-primary) !important;
+}
+
+.monaco-editor-with-grid,
+.monaco-editor,
+.monaco-editor .monaco-editor-background,
+.monaco-editor .view-lines {
+    background-color: var(--bg-primary) !important;
+}
+
+/* Ensure clean backgrounds throughout Monaco */
+.monaco-editor .overflow-guard {
+    background: var(--bg-primary) !important;
+}
+
+.monaco-editor .monaco-scrollable-element {
+    background: transparent !important;
+}
+
+/* Slimmer and less obtrusive line numbers */
+.monaco-editor .margin {
+    background: var(--bg-primary) !important;
+    width: 40px !important; /* Make line number margin narrower */
+}
+
+.monaco-editor .margin .line-numbers {
+    font-size: 11px !important; /* Smaller font size */
+    color: var(--text-secondary) !important; /* Subtle color */
+    font-weight: 300 !important; /* Lighter font weight */
+    padding-right: 8px !important; /* Less padding */
+    text-align: right !important;
+    opacity: 0.6;
+}
+
+.monaco-editor .margin .line-numbers.active-line-number {
+    color: var(--accent-primary) !important; /* Accent color for active line */
+    opacity: 0.8;
+}
+
+/* Hide line number decorations that might be too prominent */
+.monaco-editor .margin-view-overlays {
+    background: transparent !important;
+}
+
+/* Dark blue theme colors inspired by the image */
+.theme-dark-blue {
+    background: #1a2332 !important;
+    color: #e2e8f0 !important;
+}
+
+.theme-dark-blue .monaco-editor {
+    background: #1a2332 !important;
+}
+
+.theme-dark-blue .monaco-editor .monaco-editor-background {
+    background: #1a2332 !important;
+}
+
+/* Dynamic accent colors for headers and buttons */
+.accent-orange {
+    color: var(--accent-primary) !important;
+}
+
+.accent-border {
+    border-color: var(--border-color) !important;
+}
+
+.button-accent {
+    background: var(--highlight-bg) !important;
+    color: var(--accent-primary) !important;
+    border: 1px solid var(--highlight-border) !important;
+}
+
+.button-accent:hover {
+    background: var(--highlight-bg) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Smooth animations */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.pulse-glow {
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+}
+
+/* Modern glass morphism effect */
+.glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient backgrounds */
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-accent {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+}
+
+/* ========== AVANT-GARDE TYPOGRAPHY ========== */
+
+/* Main heading - edgy, nonconformist styling */
+.heading-avant-garde {
+    font-family: 'Space Grotesk', 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--text-primary));
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 8s ease-in-out infinite;
+    position: relative;
+    display: inline-block;
+    filter: drop-shadow(0 0 20px var(--accent-secondary));
+}
+
+/* Subtle glitch effect on hover */
+.heading-avant-garde::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0;
+    animation: gradientShift 6s ease-in-out infinite reverse;
+    z-index: -1;
+}
+
+.heading-avant-garde:hover::before {
+    opacity: 0.7;
+    animation: glitchEffect 0.3s ease-in-out;
+}
+
+/* Dynamic gradient animation */
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    25% { background-position: 100% 50%; }
+    50% { background-position: 50% 100%; }
+    75% { background-position: 50% 0%; }
+}
+
+/* Subtle glitch animation */
+@keyframes glitchEffect {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-1px, 1px); }
+    40% { transform: translate(1px, -1px); }
+    60% { transform: translate(-1px, -1px); }
+    80% { transform: translate(1px, 1px); }
+}
+
+/* Modern icon styling */
+.icon-avant-garde {
+    font-size: 2.2rem;
+    color: var(--accent-primary);
+    filter: drop-shadow(0 0 15px var(--accent-secondary));
+    animation: iconPulse 4s ease-in-out infinite;
+    transform-origin: center;
+    transition: all 0.3s ease;
+}
+
+.icon-avant-garde:hover {
+    transform: scale(1.15) rotate(15deg);
+    filter: drop-shadow(0 0 25px var(--accent-primary));
+}
+
+/* Header branding container */
+.branding-container {
+    position: relative;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    background: var(--highlight-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--highlight-border);
+    transition: all 0.3s ease;
+}
+
+.branding-container:hover {
+    background: var(--highlight-bg);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px var(--highlight-border);
+}
+
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.05) rotate(-2deg); }
+    50% { transform: scale(1.1) rotate(0deg); }
+    75% { transform: scale(1.05) rotate(2deg); }
+}
+
+/* Responsive typography adjustments */
+@media (max-width: 768px) {
+    .heading-avant-garde {
+        font-size: 2rem;
+        letter-spacing: -0.01em;
+    }
+    
+    .icon-avant-garde {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .heading-avant-garde {
+        font-size: 1.75rem;
+        letter-spacing: 0;
+    }
+    
+    .icon-avant-garde {
+        font-size: 1.6rem;
+    }
+}
+
+/* ========== THEME DEFINITIONS ========== */
+
+/* Dark Orange Theme (Default) */
+.theme-dark-orange {
+    --bg-primary: #1a2332;
+    --bg-secondary: #2d3748;
+    --bg-tertiary: #4a5568;
+    --text-primary: #e2e8f0;
+    --text-secondary: #a0aec0;
+    --accent-primary: #ff8c42;
+    --accent-secondary: #ff6b35;
+    --border-color: #ff6b35;
+    --cursor-color: #ff8c42;
+    --highlight-bg: rgba(255, 140, 66, 0.15);
+    --highlight-border: rgba(255, 140, 66, 0.4);
+    --accent-primary-rgb: 255, 140, 66;
+}
+
+/* Solarized Dark Theme */
+.theme-solarized-dark {
+    --bg-primary: #002b36;
+    --bg-secondary: #073642;
+    --bg-tertiary: #586e75;
+    --text-primary: #839496;
+    --text-secondary: #657b83;
+    --accent-primary: #268bd2;
+    --accent-secondary: #2aa198;
+    --border-color: #2aa198;
+    --cursor-color: #268bd2;
+    --highlight-bg: rgba(38, 139, 210, 0.15);
+    --highlight-border: rgba(38, 139, 210, 0.4);
+    --accent-primary-rgb: 38, 139, 210;
+}
+
+/* Monokai Theme */
+.theme-monokai {
+    --bg-primary: #272822;
+    --bg-secondary: #3e3d32;
+    --bg-tertiary: #49483e;
+    --text-primary: #f8f8f2;
+    --text-secondary: #75715e;
+    --accent-primary: #a6e22e;
+    --accent-secondary: #f92672;
+    --border-color: #a6e22e;
+    --cursor-color: #f92672;
+    --highlight-bg: rgba(166, 226, 46, 0.15);
+    --highlight-border: rgba(166, 226, 46, 0.4);
+    --accent-primary-rgb: 166, 226, 46;
+}
+
+/* Dracula Theme */
+.theme-dracula {
+    --bg-primary: #282a36;
+    --bg-secondary: #44475a;
+    --bg-tertiary: #6272a4;
+    --text-primary: #f8f8f2;
+    --text-secondary: #6272a4;
+    --accent-primary: #bd93f9;
+    --accent-secondary: #ff79c6;
+    --border-color: #bd93f9;
+    --cursor-color: #ff79c6;
+    --highlight-bg: rgba(189, 147, 249, 0.15);
+    --highlight-border: rgba(189, 147, 249, 0.4);
+    --accent-primary-rgb: 189, 147, 249;
+}
+
+/* Nord Theme */
+.theme-nord {
+    --bg-primary: #2e3440;
+    --bg-secondary: #3b4252;
+    --bg-tertiary: #434c5e;
+    --text-primary: #eceff4;
+    --text-secondary: #d8dee9;
+    --accent-primary: #88c0d0;
+    --accent-secondary: #5e81ac;
+    --border-color: #88c0d0;
+    --cursor-color: #5e81ac;
+    --highlight-bg: rgba(136, 192, 208, 0.15);
+    --highlight-border: rgba(136, 192, 208, 0.4);
+    --accent-primary-rgb: 136, 192, 208;
+}
+
+/* GitHub Dark Theme */
+.theme-github-dark {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #21262d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent-primary: #58a6ff;
+    --accent-secondary: #1f6feb;
+    --border-color: #58a6ff;
+    --cursor-color: #1f6feb;
+    --highlight-bg: rgba(88, 166, 255, 0.15);
+    --highlight-border: rgba(88, 166, 255, 0.4);
+    --accent-primary-rgb: 88, 166, 255;
+}
+
+/* ========== ENHANCED CURSOR HIGHLIGHTING ========== */
+
+/* Monaco Editor Cursor Styling */
+.monaco-editor .cursor {
+    background: var(--accent-primary) !important;
+    width: 2px !important; /* Thinner cursor */
+    animation: cursorBlink 2s infinite; /* Slower blinking */
+}
+
+/* Smooth cursor blinking animation - slower and more visible */
+@keyframes cursorBlink {
+    0%, 70% { opacity: 1; }
+    71%, 100% { opacity: 0; }
+}
+
+/* Current line highlighting - more visible */
+.monaco-editor .current-line {
+    background: var(--highlight-bg) !important;
+    border: none !important;
+}
+
+/* Line highlight border - more prominent */
+.monaco-editor .current-line-exact {
+    background: var(--highlight-bg) !important;
+    border-left: 4px solid var(--highlight-border) !important;
+    border-radius: 0 !important;
+    box-shadow: inset 0 0 0 1px var(--highlight-border) !important;
+}
+
+/* Selection highlighting */
+.monaco-editor .selected-text {
+    background: var(--highlight-bg) !important;
+    border-radius: 2px !important;
+}
+
+/* Multiple selections */
+.monaco-editor .selection-highlight {
+    background: var(--highlight-bg) !important;
+    border: 1px solid var(--highlight-border) !important;
+    border-radius: 2px !important;
+}
+
+/* Word highlighting on cursor - more visible */
+.monaco-editor .wordHighlight {
+    background: var(--highlight-bg) !important;
+    border: 2px solid var(--highlight-border) !important;
+    border-radius: 3px !important;
+    animation: wordHighlightPulse 1.5s ease-in-out; /* Slower animation */
+    box-shadow: 0 0 0 1px var(--highlight-border) !important;
+}
+
+@keyframes wordHighlightPulse {
+    0% { opacity: 0.7; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Strong word highlighting - more prominent */
+.monaco-editor .wordHighlightStrong {
+    background: var(--highlight-bg) !important;
+    border: 2px solid var(--highlight-border) !important;
+    border-radius: 3px !important;
+    box-shadow: 0 0 0 2px var(--highlight-border) !important;
+}
+
+/* Cursor line decorations */
+.monaco-editor .cursors-layer .cursor-line-style {
+    background: var(--highlight-bg) !important;
+    border-left: 2px solid var(--accent-primary) !important;
+}
+
+/* Focus ring for editor */
+.monaco-editor:focus-within {
+    box-shadow: 0 0 0 2px var(--highlight-bg) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Find/replace highlighting */
+.monaco-editor .findMatch {
+    background: var(--highlight-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 2px !important;
+    animation: findMatchGlow 0.6s ease-in-out;
+}
+
+@keyframes findMatchGlow {
+    0% { background: var(--highlight-border); }
+    100% { background: var(--highlight-bg); }
+}
+
+/* Current find match */
+.monaco-editor .currentFindMatch {
+    background: var(--highlight-border) !important;
+    border: 3px solid var(--border-color) !important;
+    border-radius: 3px !important;
+    animation: currentFindPulse 2s infinite; /* Slower pulse */
+}
+
+@keyframes currentFindPulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--highlight-border); }
+    50% { box-shadow: 0 0 0 6px var(--highlight-bg); }
+}
+
+/* Bracket matching */
+.monaco-editor .bracket-match {
+    background: var(--highlight-bg) !important;
+    border: 1px solid var(--highlight-border) !important;
+    border-radius: 2px !important;
+}
+
+/* Indent guides enhancement */
+.monaco-editor .lines-content .cigr {
+    box-shadow: 1px 0 0 0 var(--highlight-bg) !important;
+}
+
+/* Active indent guide */
+.monaco-editor .lines-content .cigra {
+    box-shadow: 1px 0 0 0 var(--highlight-border) !important;
+}
+
+/* Cursor smooth movement */
+.monaco-editor .cursors-layer {
+    animation-duration: 0.1s;
+    animation-timing-function: ease-out;
+}
+
+/* Enhanced line number highlighting for cursor line */
+.monaco-editor .current-line .line-numbers {
+    color: var(--accent-primary) !important;
+    font-weight: 600 !important;
+    background: var(--highlight-bg) !important;
+    border-radius: 0 4px 4px 0 !important;
+}
+
+/* Fallback textarea cursor styling - now uses CSS variables */
+textarea.courier-font:focus {
+    caret-color: var(--accent-primary) !important;
+    outline: 2px solid var(--highlight-border) !important;
+    outline-offset: -2px !important;
+    box-shadow: 0 0 0 3px var(--highlight-bg) !important;
+}
+
+/* ========== ENHANCED EDITOR FOCUS STATES ========== */
+
+/* Focused editor container */
+.monaco-editor-focused {
+    box-shadow: 0 0 0 2px var(--highlight-border) !important;
+    border-color: var(--accent-primary) !important;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced cursor visibility when focused */
+.monaco-editor-focused .cursor {
+    background: var(--accent-primary) !important;
+    width: 2.5px !important; /* Slightly thicker when focused but still thin */
+    animation: cursorBlinkFocused 2.5s infinite; /* Much slower when focused */
+}
+
+@keyframes cursorBlinkFocused {
+    0%, 75% { opacity: 1; }
+    76%, 100% { opacity: 0; }
+}
+
+/* Enhanced line highlighting when focused - more visible */
+.monaco-editor-focused .current-line {
+    background: var(--highlight-bg) !important;
+    border-left: 5px solid var(--highlight-border) !important;
+    box-shadow: inset 0 0 0 1px var(--highlight-border) !important;
+}
+
+/* Enhanced word highlighting when focused - more visible */
+.monaco-editor-focused .wordHighlight {
+    background: var(--highlight-border) !important;
+    border: 2px solid var(--accent-primary) !important;
+    animation: wordHighlightFocused 1.2s ease-in-out; /* Slower animation */
+    box-shadow: 0 0 0 2px var(--highlight-bg) !important;
+}
+
+@keyframes wordHighlightFocused {
+    0% { opacity: 0.6; transform: scale(0.96); }
+    50% { opacity: 1; transform: scale(1.04); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Enhanced selection highlighting when focused */
+.monaco-editor-focused .selected-text {
+    background: var(--highlight-bg) !important;
+    border-radius: 3px !important;
+    box-shadow: 0 0 0 1px var(--highlight-bg);
+}
+
+/* Smooth transitions for all highlight elements - slower and more visible */
+.monaco-editor .cursor,
+.monaco-editor .current-line,
+.monaco-editor .wordHighlight,
+.monaco-editor .selected-text,
+.monaco-editor .findMatch,
+.monaco-editor .bracket-match {
+    transition: all 0.3s ease-in-out; /* Slower transitions */
+}
+
+/* Active line number enhancement when focused */
+.monaco-editor-focused .current-line .line-numbers {
+    color: var(--accent-secondary) !important;
+    font-weight: 700 !important;
+    background: var(--highlight-bg) !important;
+    border-radius: 0 6px 6px 0 !important;
+    transform: translateX(2px);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Indent guides enhancement when focused */
+.monaco-editor-focused .lines-content .cigra {
+    box-shadow: 2px 0 0 0 var(--highlight-border) !important;
+}
+
+/* Subtle glow effect for the entire editor when focused */
+.monaco-editor-focused::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--highlight-bg), var(--highlight-bg));
+    border-radius: 8px;
+    z-index: -1;
+    opacity: 0;
+    animation: editorFocusGlow 0.3s ease-in-out forwards;
+}
+
+@keyframes editorFocusGlow {
+    to { opacity: 1; }
+}
