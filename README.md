@@ -1,177 +1,119 @@
 # Teaching Notes Studio
 
-A powerful, browser-based React application designed for educators to create, manage, and batch-process student observation notes with dynamic theming and advanced editor features.
+A web application for educators to write and organize student observation notes. You can batch multiple students and export all notes to your clipboard for pasting into other documents.
 
-## 🌟 Features
+## Getting Started
 
-### Core Functionality
-- **Monaco Editor Integration**: Advanced code editor with syntax highlighting, autocomplete, and intelligent suggestions
-- **Template Library**: 8+ categorized observation templates for different educational scenarios
-- **Batch Processing**: Collect multiple student notes and export to clipboard in LLM-friendly format
-- **Real-time Statistics**: Live word count, concept tracking, and language detection
-- **Enhanced Autocomplete**: Context-aware suggestions based on educational data
+### Option 1: Run Locally (Recommended)
 
-### Dynamic Theming System
-- **6 Professional Themes**: Dark Orange, Solarized Dark, Monokai, Dracula, Nord, and GitHub Dark
-- **Dynamic Color Adaptation**: All UI elements automatically adapt to selected theme
-- **Monaco Editor Theming**: Editor colors, highlights, and cursors change with theme
-- **Visual Theme Feedback**: Notifications when changing themes
-- **CSS Variable System**: Comprehensive theming using CSS custom properties
+1. **Download or clone this project**
 
-### User Experience
-- **Keyboard Shortcuts**: Full keyboard navigation and quick actions
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Graceful Degradation**: Fallback to enhanced textarea if Monaco fails to load
-- **Recent Students**: Always-visible section with empty state handling
-- **Enhanced Typography**: Modern font stack with avant-garde branding
-
-## 🚀 Quick Start
-
-### Development Setup
-No build process required - this is a static web application:
-
-1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd simple-note-generation
+   cd notes-studio
    ```
 
-2. **Start a local server**
+2. **Start a web server** (required for full functionality)
+
    ```bash
+   # If you have Python 3:
    python3 -m http.server 8000
-   # or
+
+   # If you have Node.js:
    npx serve .
-   # or
+
+   # If you have PHP:
    php -S localhost:8000
    ```
 
-3. **Open in browser**
+3. **Open in your browser**
    ```
    http://localhost:8000
    ```
 
-### Production Deployment
-Simply upload all files to any web server or static hosting service (GitHub Pages, Netlify, Vercel, etc.).
+### Option 2: Just Open the File
 
-## 🎨 Themes
+You can double-click `index.html` to open it directly in your browser, but some features (like autocomplete data) won't work without a web server.
 
-The application includes 6 carefully crafted themes:
+### Option 3: Online
 
-- **Dark Orange** (Default): Warm orange accents on dark blue background
-- **Solarized Dark**: Elegant blue tones inspired by the Solarized color scheme
-- **Monokai**: Green and pink highlights on dark background
-- **Dracula**: Purple and pink theme with high contrast
-- **Nord**: Cool blue and cyan colors inspired by Arctic landscapes
-- **GitHub Dark**: Professional blue theme matching GitHub's dark mode
+You can also visit the Github Pages Site
 
-Each theme dynamically updates:
-- Monaco Editor colors and highlights
-- UI component borders and backgrounds
-- Button and interaction states
-- Statistics badges and indicators
-- Keyboard shortcut styling
+## How to Use
 
-## 📁 Project Structure
+### Basic Workflow
 
-```
-├── index.html              # Main entry point with CDN links
-├── src/
-│   ├── app.js              # Complete React application (1500+ lines)
-│   └── data/
-│       ├── templates.js    # Observation templates and constants
-│       ├── data-loader.js  # Enhanced data loading system
-│       ├── suggestion-engine.js  # Intelligent suggestion engine
-│       ├── monaco-integration.js # Monaco editor autocomplete
-│       └── notes-analyzer.js     # Note analysis utilities
-├── config/
-│   ├── monaco-config.js    # Monaco Editor CDN configuration
-│   └── app-config.js       # Error handling and environment setup
-├── assets/
-│   └── styles.css          # Comprehensive CSS with dynamic theming (600+ lines)
-├── scraped_notes.json      # Sample data for autocomplete system
-└── README.md               # This file
-```
+1. Enter a student's name in the top text field
+2. Write your observation notes in the editor below
+3. Click "Add to Batch" or press `Ctrl+Enter`
+4. Repeat for more students
+5. Click "Export Batch" or press `Ctrl+E` to copy all notes to your clipboard
+6. Paste into your gradebook, LMS, or wherever you keep records
 
-## 🎯 Template Categories
+### Using Templates
 
-The application includes comprehensive observation templates:
+- Click any template button to insert common observation phrases
+- Use `Ctrl+Space` to trigger autocomplete while typing
+- Press `Ctrl+←` or `Ctrl+→` to cycle through template categories
+
+### Themes
+
+Use the theme dropdown in the top-right corner to change colors. All 6 themes will update the entire interface including the editor.
+
+## Available Themes
+
+Six color themes are available:
+
+- **Dark Orange** (Default): Orange highlights on dark background
+- **Solarized Dark**: Blue tones
+- **Monokai**: Green and pink highlights
+- **Dracula**: Purple and pink
+- **Nord**: Blue and cyan
+- **GitHub Dark**: Blue theme
+
+When you change themes, the editor colors and all interface elements update to match.
+
+## Template Categories
+
+Eight types of observation templates are included:
 
 1. **Engagement** - Student participation and motivation
-2. **Problem Solving** - Analytical and debugging skills
-3. **Technical Progress** - Programming concept mastery
-4. **Challenging Behaviors** - Areas needing attention
-5. **Avoidance Patterns** - Resistance to difficult tasks
+2. **Problem Solving** - How students approach challenges
+3. **Technical Progress** - Skills and concept understanding
+4. **Challenging Behaviors** - Areas that need support
+5. **Avoidance Patterns** - When students resist tasks
 6. **Disruptive Behaviors** - Classroom management notes
-7. **Critical Thinking** - Advanced reasoning skills
-8. **Social Emotional** - Collaboration and emotional regulation
+7. **Critical Thinking** - Advanced reasoning
+8. **Social Emotional** - Collaboration and self-regulation
 
-## ⌨️ Keyboard Shortcuts
+## Keyboard Shortcuts
 
-- `Ctrl+Enter` - Add current student to batch
+- `Ctrl+Enter` - Add student to batch
 - `Ctrl+E` - Export batch to clipboard
-- `Ctrl+R` - Clear batch (with confirmation)
-- `Ctrl+Space` - Trigger autocomplete
-- `Ctrl+←/→` - Cycle through template categories
-- `Enter` in student name field - Focus editor
+- `Ctrl+R` - Clear batch
+- `Ctrl+Space` - Show autocomplete suggestions
+- `Ctrl+←/→` - Switch template categories
+- `Enter` in name field - Jump to editor
 
-## 🔧 Technical Details
+## File Structure
 
-### Technologies Used
-- **React 18** - Modern UI framework with hooks
-- **Monaco Editor** - VS Code's editor for web browsers
-- **Tailwind CSS** - Utility-first CSS framework
-- **Font Awesome** - Professional icon library
-- **Google Fonts** - Custom typography (Inter, JetBrains Mono, Space Grotesk)
+```
+├── index.html              # Main file to open
+├── src/app.js              # Main application code
+├── src/data/               # Templates and autocomplete data
+├── assets/styles.css       # Styling and themes
+├── config/                 # Editor configuration
+└── scraped_notes.json      # Sample autocomplete data
+```
 
-### Browser Compatibility
-- Modern browsers with ES6+ support
-- Monaco Editor requires modern JavaScript features
-- Graceful fallback to enhanced textarea for older browsers
-- HTTPS recommended for full clipboard functionality
+## Technical Requirements
 
-### Performance Features
-- CDN-based dependencies for fast loading
-- Lazy loading of Monaco Editor
-- Debounced text analysis for real-time statistics
-- Efficient React state management
-- CSS animations with GPU acceleration
+- Works in Chrome, Firefox, Safari, Edge (recent versions)
+- Uses React, Monaco Editor (VS Code's editor), and Tailwind CSS
+- No installation needed - everything loads from CDN
+- Best experience with a web server, but will work by opening the HTML file
+- HTTPS gives better clipboard functionality
 
-## 🔒 Security & Privacy
+## Privacy
 
-- **No server required** - All processing happens in the browser
-- **No data collection** - Student information stays local
-- **Secure clipboard access** - Uses modern Clipboard API with fallbacks
-- **HTTPS friendly** - Optimized for secure contexts
-
-## 🤝 Contributing
-
-### Development Guidelines
-1. Follow existing code style and conventions
-2. Test on multiple browsers and themes
-3. Ensure accessibility compliance
-4. Document any new template categories
-5. Maintain backwards compatibility
-
-### Adding New Themes
-1. Add theme configuration in `getThemeColors()` function
-2. Define CSS variables in `styles.css`
-3. Test all UI components with new colors
-4. Update theme selector options
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-## 🔮 Future Enhancements
-
-- Additional theme options (light themes, high contrast)
-- Export to multiple formats (PDF, Word, etc.)
-- Template customization interface
-- Offline progressive web app capabilities
-- Advanced text analysis and suggestions
-- Integration with learning management systems
-
----
-
-**Teaching Notes Studio** - Empowering educators with modern tools for student observation and assessment.
-
+Your student data never leaves your browser. Nothing is sent to any server or stored anywhere except your local session.
