@@ -1,5 +1,171 @@
 const { useState, useEffect, useRef, useCallback } = React;
 
+// Custom hook for speech recognition management
+function useSpeechRecognition() {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isSupported, setIsSupported] = useState(false);
+  const [error, setError] = useState(null);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [finalTranscript, setFinalTranscript] = useState('');
+
+  const recognitionRef = useRef(null);
+  const isRecordingRef = useRef(false); // Ref for event handlers
+
+  // Initialize recognition once
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setIsSupported(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      recognition.lang = 'en-US';
+
+      // Event handlers - use refs to avoid stale closures
+      recognition.onstart = () => {
+        setIsRecording(true);
+        setError(null);
+        setInterimTranscript('');
+        setFinalTranscript('');
+      };
+
+      recognition.onresult = (event) => {
+        let interim = '';
+        let final = '';
+
+        for (let i = 0; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            final += transcript + ' ';
+          } else {
+            interim += transcript;
+          }
+        }
+
+        setFinalTranscript(final);
+        setInterimTranscript(interim);
+      };
+
+      recognition.onend = () => {
+        // Use ref instead of state to avoid stale closure
+        if (isRecordingRef.current) {
+          try {
+            recognition.start();
+          } catch (e) {
+            console.warn('Failed to restart recognition:', e);
+          }
+        } else {
+          setInterimTranscript('');
+        }
+      };
+
+      recognition.onerror = (event) => {
+        const errorTypes = {
+          'no-speech': { message: 'No speech detected', transient: true },
+          'audio-capture': { message: 'Microphone access failed', transient: false },
+          'not-allowed': { message: 'Microphone permission denied', transient: false },
+          'network': { message: 'Network error', transient: true },
+          'aborted': { message: null, transient: true },
+        };
+
+        const errorInfo = errorTypes[event.error] || {
+          message: `Error: ${event.error}`,
+          transient: true
+        };
+
+        if (errorInfo.message) {
+          setError({
+            message: errorInfo.message,
+            type: event.error,
+            transient: errorInfo.transient
+          });
+        }
+
+        if (!errorInfo.transient) {
+          setIsRecording(false);
+          isRecordingRef.current = false;
+        }
+      };
+
+      recognitionRef.current = recognition;
+      setIsSupported(true);
+
+    } catch (error) {
+      console.error('Speech recognition initialization failed:', error);
+      setIsSupported(false);
+      setError({
+        message: 'Speech recognition initialization failed',
+        type: 'init-failed',
+        transient: false
+      });
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+      }
+    };
+  }, []); // Only run once
+
+  const toggleRecording = useCallback(() => {
+    if (!recognitionRef.current || !isSupported) {
+      return;
+    }
+
+    if (isRecordingRef.current) {
+      // Stop recording
+      try {
+        isRecordingRef.current = false;
+        recognitionRef.current.stop();
+        setIsRecording(false);
+      } catch (error) {
+        console.error('Failed to stop recording:', error);
+        isRecordingRef.current = false;
+        setIsRecording(false);
+      }
+    } else {
+      // Start recording
+      try {
+        setInterimTranscript('');
+        setFinalTranscript('');
+        setError(null);
+        isRecordingRef.current = true;
+        recognitionRef.current.start();
+      } catch (error) {
+        if (!error.message.includes('already started')) {
+          console.error('Failed to start recording:', error);
+          setError({
+            message: 'Failed to start recording',
+            type: 'start-failed',
+            transient: true
+          });
+          isRecordingRef.current = false;
+          setIsRecording(false);
+        }
+      }
+    }
+  }, [isSupported]);
+
+  return {
+    isRecording,
+    isSupported,
+    error,
+    interimTranscript,
+    finalTranscript,
+    toggleRecording,
+  };
+}
+
 // Main App Component
 function TeachingNotesApp() {
   const [students, setStudents] = useState([]);
@@ -31,6 +197,20 @@ Main Activity: [Enter main activity description]
   const monacoRef = useRef(null);
   const suggestionEngineRef = useRef(null);
   const monacoIntegrationRef = useRef(null);
+
+  // Speech recognition hook
+  const {
+    isRecording,
+    isSupported: speechSupported,
+    error: speechError,
+    interimTranscript,
+    finalTranscript,
+    toggleRecording,
+  } = useSpeechRecognition();
+
+  // Track where we started inserting speech text
+  const speechStartPosRef = useRef(null);
+  const lastInsertedLengthRef = useRef(0);
 
   // Comprehensive theme configuration
   const getThemeColors = (theme) => {
@@ -556,6 +736,207 @@ Main Activity: [Enter main activity description]
     setStats({ words, concepts, languages });
   }, []);
 
+  // Shared text insertion utility - used by templates and speech transcription
+  const insertTextAtCursor = useCallback((text, options = {}) => {
+    const { addSpacing = true, addNewline = false } = options;
+
+    if (monacoRef.current) {
+      // Monaco editor insertion
+      const position = monacoRef.current.getPosition();
+      const model = monacoRef.current.getModel();
+
+      // Smart spacing: check actual character before cursor
+      let textToInsert = text;
+      if (addSpacing && position.column > 1) {
+        const charBefore = model.getValueInRange({
+          startLineNumber: position.lineNumber,
+          startColumn: position.column - 1,
+          endLineNumber: position.lineNumber,
+          endColumn: position.column
+        });
+        if (charBefore && !/\s/.test(charBefore)) {
+          textToInsert = ' ' + text;
+        }
+      }
+      if (addNewline) {
+        textToInsert += '\n';
+      }
+
+      model.pushEditOperations(
+        [],
+        [{
+          range: {
+            startLineNumber: position.lineNumber,
+            startColumn: position.column,
+            endLineNumber: position.lineNumber,
+            endColumn: position.column,
+          },
+          text: textToInsert,
+        }],
+        () => null
+      );
+
+      const newValue = monacoRef.current.getValue();
+      setCurrentNotes(newValue);
+      updateStats(newValue);
+
+      monacoRef.current.setPosition({
+        lineNumber: position.lineNumber,
+        column: position.column + textToInsert.length
+      });
+      monacoRef.current.focus();
+
+    } else {
+      // Textarea fallback
+      const textarea = document.querySelector('textarea.courier-font');
+      if (textarea) {
+        const start = textarea.selectionStart;
+
+        // Smart spacing for textarea
+        let textToInsert = text;
+        if (addSpacing && start > 0) {
+          const charBefore = currentNotes.charAt(start - 1);
+          if (charBefore && !/\s/.test(charBefore)) {
+            textToInsert = ' ' + text;
+          }
+        }
+        if (addNewline) {
+          textToInsert += '\n';
+        }
+
+        const newText =
+          currentNotes.substring(0, start) +
+          textToInsert +
+          currentNotes.substring(textarea.selectionEnd);
+
+        setCurrentNotes(newText);
+        updateStats(newText);
+
+        setTimeout(() => {
+          textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
+          textarea.focus();
+        }, 0);
+      }
+    }
+  }, [currentNotes, updateStats]);
+
+  // Speech recognition toggle handler
+  const handleToggleRecording = useCallback(() => {
+    if (!speechSupported) return;
+
+    if (!isRecording) {
+      // Starting recording - save cursor position
+      if (monacoRef.current) {
+        speechStartPosRef.current = monacoRef.current.getPosition();
+        lastInsertedLengthRef.current = 0;
+      } else {
+        // For textarea fallback
+        const textarea = document.querySelector('textarea.courier-font');
+        if (textarea) {
+          speechStartPosRef.current = textarea.selectionStart;
+          lastInsertedLengthRef.current = 0;
+        }
+      }
+    }
+
+    toggleRecording();
+  }, [speechSupported, toggleRecording, isRecording]);
+
+  // Live text insertion effect - updates editor as user speaks
+  useEffect(() => {
+    if (!isRecording || !speechStartPosRef.current) return;
+
+    // Combine final and interim transcripts
+    const fullText = finalTranscript + interimTranscript;
+    if (!fullText) return;
+
+    if (monacoRef.current) {
+      // Monaco editor live insertion
+      const model = monacoRef.current.getModel();
+      const startPos = speechStartPosRef.current;
+
+      // Calculate range to replace (delete previously inserted text)
+      const deleteRange = {
+        startLineNumber: startPos.lineNumber,
+        startColumn: startPos.column,
+        endLineNumber: startPos.lineNumber,
+        endColumn: startPos.column + lastInsertedLengthRef.current,
+      };
+
+      // Smart spacing: check if we need space before first insertion
+      let textToInsert = fullText;
+      if (lastInsertedLengthRef.current === 0 && startPos.column > 1) {
+        const charBefore = model.getValueInRange({
+          startLineNumber: startPos.lineNumber,
+          startColumn: startPos.column - 1,
+          endLineNumber: startPos.lineNumber,
+          endColumn: startPos.column
+        });
+        if (charBefore && !/\s/.test(charBefore)) {
+          textToInsert = ' ' + fullText;
+        }
+      }
+
+      // Replace the old text with new text
+      model.pushEditOperations(
+        [],
+        [{
+          range: deleteRange,
+          text: textToInsert,
+        }],
+        () => null
+      );
+
+      // Update state and stats
+      const newValue = monacoRef.current.getValue();
+      setCurrentNotes(newValue);
+      updateStats(newValue);
+
+      // Track how much text we inserted
+      lastInsertedLengthRef.current = textToInsert.length;
+
+      // Move cursor to end of inserted text
+      monacoRef.current.setPosition({
+        lineNumber: startPos.lineNumber,
+        column: startPos.column + textToInsert.length
+      });
+
+    } else {
+      // Textarea fallback
+      const textarea = document.querySelector('textarea.courier-font');
+      if (textarea) {
+        const startPos = speechStartPosRef.current;
+
+        // Smart spacing for first insertion
+        let textToInsert = fullText;
+        if (lastInsertedLengthRef.current === 0 && startPos > 0) {
+          const charBefore = currentNotes.charAt(startPos - 1);
+          if (charBefore && !/\s/.test(charBefore)) {
+            textToInsert = ' ' + fullText;
+          }
+        }
+
+        // Replace old text with new text
+        const newText =
+          currentNotes.substring(0, startPos) +
+          textToInsert +
+          currentNotes.substring(startPos + lastInsertedLengthRef.current);
+
+        setCurrentNotes(newText);
+        updateStats(newText);
+
+        // Track how much text we inserted
+        lastInsertedLengthRef.current = textToInsert.length;
+
+        // Update cursor position
+        setTimeout(() => {
+          textarea.selectionStart = textarea.selectionEnd = startPos + textToInsert.length;
+          textarea.focus();
+        }, 0);
+      }
+    }
+  }, [interimTranscript, finalTranscript, isRecording, currentNotes, updateStats]);
+
   // Add student to batch
   const addToBatch = useCallback(() => {
     if (!currentStudent.trim()) {
@@ -940,6 +1321,14 @@ Main Activity: [Enter main activity description]
             e.stopPropagation();
             cycleThroughTemplates("next");
             break;
+          case 'm':
+          case 'M':
+            if (e.shiftKey && speechSupported) {
+              e.preventDefault();
+              e.stopPropagation();
+              handleToggleRecording();
+            }
+            break;
         }
       }
     };
@@ -947,7 +1336,8 @@ Main Activity: [Enter main activity description]
     // Add event listener with capture to intercept before browser defaults
     window.addEventListener("keydown", handleKeyboard, true);
     return () => window.removeEventListener("keydown", handleKeyboard, true);
-  }, [addToBatch, processBatch, clearBatch, activeTemplateTab]);
+  }, [addToBatch, processBatch, clearBatch, activeTemplateTab,
+      speechSupported, handleToggleRecording]);
 
   // Function to cycle through template categories
   const cycleThroughTemplates = useCallback(
@@ -1265,6 +1655,81 @@ Main Activity: [Enter main activity description]
               </div>
 
               <div className="flex space-x-2">
+                {/* Speech-to-Text Button */}
+                {speechSupported && (
+                  <div className="relative">
+                    <button
+                      onClick={handleToggleRecording}
+                      disabled={!speechSupported}
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                        isRecording ? 'button-accent pulse-glow' : 'button-accent'
+                      }`}
+                      style={{
+                        backgroundColor: isRecording
+                          ? getThemeColors(currentTheme).primary
+                          : getThemeColors(currentTheme).backgroundSecondary,
+                        borderColor: isRecording
+                          ? getThemeColors(currentTheme).primary
+                          : getThemeColors(currentTheme).border,
+                        color: isRecording ? '#ffffff' : getThemeColors(currentTheme).text,
+                        cursor: 'pointer',
+                        border: `2px solid`,
+                      }}
+                      title="Click to toggle speech recording (or use Ctrl+Shift+M)"
+                      aria-label="Click to toggle speech recording and see text appear live"
+                      aria-pressed={isRecording}
+                    >
+                      <i className={`fas ${isRecording ? 'fa-microphone' : 'fa-microphone-slash'} mr-2`}></i>
+                      {isRecording ? 'Stop Recording' : 'Start Speaking'}
+                    </button>
+
+                    {/* Error message display */}
+                    {speechError && (
+                      <div
+                        className="absolute top-full mt-2 left-0 text-xs px-3 py-2 rounded-lg flex items-center whitespace-nowrap z-50"
+                        style={{
+                          backgroundColor: speechError.transient
+                            ? 'rgba(251, 191, 36, 0.15)'
+                            : 'rgba(239, 68, 68, 0.15)',
+                          color: speechError.transient ? '#fbbf24' : '#ef4444',
+                          border: `1px solid ${speechError.transient ? 'rgba(251, 191, 36, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                          minWidth: '200px',
+                          maxWidth: '300px',
+                        }}
+                      >
+                        <i className={`fas ${speechError.transient ? 'fa-exclamation-triangle' : 'fa-times-circle'} mr-2`}></i>
+                        <span>{speechError.message}</span>
+                        {!speechError.transient && (
+                          <a
+                            href="https://support.google.com/chrome/answer/2693767"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 underline"
+                            style={{ color: 'inherit' }}
+                          >
+                            Help
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Unsupported browser warning */}
+                {!speechSupported && (
+                  <div
+                    className="text-xs px-3 py-2 rounded-lg flex items-center"
+                    style={{
+                      backgroundColor: 'rgba(156, 163, 175, 0.15)',
+                      color: '#9ca3af',
+                      border: '1px solid rgba(156, 163, 175, 0.4)',
+                    }}
+                  >
+                    <i className="fas fa-info-circle mr-2"></i>
+                    <span>Speech input not supported in this browser</span>
+                  </div>
+                )}
+
                 <button
                   onClick={() => {
                     const template = getNotesTemplate();
@@ -1336,40 +1801,7 @@ Main Activity: [Enter main activity description]
                   <button
                     key={idx}
                     onClick={() => {
-                      // Insert at cursor position instead of appending
-                      if (monacoRef.current) {
-                        const position = monacoRef.current.getPosition();
-                        const model = monacoRef.current.getModel();
-                        const range = {
-                          startLineNumber: position.lineNumber,
-                          startColumn: position.column,
-                          endLineNumber: position.lineNumber,
-                          endColumn: position.column,
-                        };
-
-                        const textToInsert = `- ${item}`;
-                        model.pushEditOperations(
-                          [],
-                          [
-                            {
-                              range: range,
-                              text: textToInsert + "\n",
-                            },
-                          ],
-                          () => null
-                        );
-
-                        // Update state
-                        const newValue = monacoRef.current.getValue();
-                        setCurrentNotes(newValue);
-                      } else {
-                        // Fallback for textarea
-                        const newText =
-                          currentNotes +
-                          (currentNotes ? "\n" : "") +
-                          `- ${item}`;
-                        setCurrentNotes(newText);
-                      }
+                      insertTextAtCursor(`- ${item}`, { addSpacing: false, addNewline: true });
                     }}
                     className="text-left p-3 text-sm rounded-lg border transition-all hover:shadow-md hover:-translate-y-0.5"
                     style={{
@@ -1611,12 +2043,24 @@ Main Activity: [Enter main activity description]
                   <span className="text-gray-300">Prev Template</span>
                   <kbd
                     className="px-2 py-1 rounded text-xs"
-                    style={{ 
-                      backgroundColor: getThemeColors(currentTheme).primary, 
-                      color: "white" 
+                    style={{
+                      backgroundColor: getThemeColors(currentTheme).primary,
+                      color: "white"
                     }}
                   >
                     Ctrl+←
+                  </kbd>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-300">Toggle Speech</span>
+                  <kbd
+                    className="px-2 py-1 rounded text-xs"
+                    style={{
+                      backgroundColor: getThemeColors(currentTheme).primary,
+                      color: "white"
+                    }}
+                  >
+                    Ctrl+Shift+M
                   </kbd>
                 </div>
               </div>
